@@ -1,6 +1,9 @@
+using System.Net;
+using BuberDinner.Application.Common.Errors;
 using BuberDinner.Application.Common.Interfaces.Authentication;
 using BuberDinner.Application.Common.Interfaces.Persistence;
 using BuberDinner.Domain.Entities;
+using OneOf;
 
 namespace BuberDinner.Application.Authentication;
 
@@ -14,12 +17,13 @@ public class AuthenticationService:IAuthenticationService
         _jwtTokenGenerator = jwtTokenGenerator;
         _userRepository = userRepository;
     }
-    public AuthenticationResult Register(string firstName, string lastName, string email, string password)
+    public OneOf<AuthenticationResult,IError> Register(string firstName, string lastName, string email, string password)
     {
         //check if user already exists
         if (_userRepository.GetUserByEmail(email) is not null)
         {
-            throw new Exception("User with given email already exists");
+            return new DuplicateEmailError(){StatusCode = (int)HttpStatusCode.Conflict,Message = "Email already exists"};
+            //throw new Exception("User with given email already exists");
         }
         //create user generate unique id
         var user = new User(){FirstName = firstName, LastName = lastName,Email = email,Password = password};

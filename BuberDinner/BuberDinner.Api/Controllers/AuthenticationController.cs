@@ -1,3 +1,4 @@
+using System.Net;
 using BuberDinner.Application.Authentication;
 using BuberDinner.Contracts.Authentication;
 using Microsoft.AspNetCore.Mvc;
@@ -16,10 +17,11 @@ public class AuthenticationController:ControllerBase
     [HttpPost("register")]
     public IActionResult Register(RegisterRequest request)
     {
-        var authResult =_authenticationService.Register(request.FirstName, request.LastName, request.Email, request.Password);
-        var response = new AuthenticationResponse(authResult.User.Id, authResult.User.FirstName, authResult.User.LastName,
-            authResult.User.Email, authResult.Token);
-        return Ok(response);
+        var result =_authenticationService.Register(request.FirstName, request.LastName, request.Email, request.Password);
+
+        return  result.Match(authResult => Ok(MapAuthResult(authResult)),
+            error => Problem(statusCode: error.StatusCode, title: error.Message));
+      
     }
 
     [HttpPost("login")]             
@@ -29,5 +31,12 @@ public class AuthenticationController:ControllerBase
         var response = new AuthenticationResponse(authResult.User.Id, authResult.User.FirstName, authResult.User.LastName,
             authResult.User.Email, authResult.Token);
         return Ok(response);
+    }
+
+    [NonAction]
+    private static AuthenticationResponse MapAuthResult(AuthenticationResult authResult)
+    {
+        return  new AuthenticationResponse(authResult.User.Id, authResult.User.FirstName, authResult.User.LastName,
+            authResult.User.Email, authResult.Token);
     }
 }
