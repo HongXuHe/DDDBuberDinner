@@ -6,6 +6,7 @@
     <UserSecretsId>0f9d1c20-2c40-48c3-a5ae-57e005dff823</UserSecretsId>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="MediatR" Version="12.1.1" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="7.0.9" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />

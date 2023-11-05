@@ -1,6 +1,9 @@
 using System.Net;
 using BuberDinner.Application.Authentication;
+using BuberDinner.Application.Authentication.Commands.Register;
+using BuberDinner.Application.Authentication.Queries.Login;
 using BuberDinner.Contracts.Authentication;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BuberDinner.Api.Controllers;
@@ -8,16 +11,19 @@ namespace BuberDinner.Api.Controllers;
 [Route("api/auth")]
 public class AuthenticationController:ControllerBase
 {
-    private readonly IAuthenticationService _authenticationService;
+    private readonly ISender _mediator;
 
-    public AuthenticationController(IAuthenticationService authenticationService)
+
+    public AuthenticationController(ISender mediator)
     {
-        _authenticationService = authenticationService;
+        _mediator = mediator;
     }
     [HttpPost("register")]
-    public IActionResult Register(RegisterRequest request)
+    public async Task<IActionResult> Register(RegisterRequest request)
     {
-        var result =_authenticationService.Register(request.FirstName, request.LastName, request.Email, request.Password);
+        var result =
+            await _mediator.Send(new RegisterCommand(request.FirstName, request.LastName, request.Email,
+                request.Password));
 
         return  result.Match(authResult => Ok(MapAuthResult(authResult)),
             error => Problem(statusCode: error.StatusCode, title: error.Message));
@@ -25,9 +31,9 @@ public class AuthenticationController:ControllerBase
     }
 
     [HttpPost("login")]             
-    public IActionResult Login(LoginRequest request)
+    public async Task<IActionResult> Login(LoginRequest request)
     {
-        var authResult =_authenticationService.Login( request.Email, request.Password);
+        var authResult = await _mediator.Send(new LoginQuery(request.Email,request.Password));
         var response = new AuthenticationResponse(authResult.User.Id, authResult.User.FirstName, authResult.User.LastName,
             authResult.User.Email, authResult.Token);
         return Ok(response);
