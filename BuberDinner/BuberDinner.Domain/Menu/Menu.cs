@@ -11,12 +11,14 @@ public sealed class Menu:AggregateRoot<MenuId>
 {
     public Menu(MenuId id,string name, string description,
         HostId hostId,
+        List<MenuSection> menuSections,
         DateTime createdDateTime,
         DateTime updatedDateTime) : base(id)
     {
         Name = name;
         Description = description;
         HostId = hostId;
+        _sections = menuSections;
         CreatedDateTime = createdDateTime;
         UpdatedDateTime = updatedDateTime;
     }
@@ -35,8 +37,9 @@ public sealed class Menu:AggregateRoot<MenuId>
     public DateTime CreatedDateTime { get; set; }
     public DateTime UpdatedDateTime { get; set; }
 
-    public static Menu Create(string name, string description, HostId hostId)
+    public static Menu Create(string name, string description, HostId hostId,
+        List<MenuSection> menuSections)
     {
-        return new Menu(MenuId.CreateUnique(), name, description, hostId,DateTime.UtcNow,DateTime.UtcNow);
+        return new Menu(MenuId.CreateUnique(), name, description, hostId,menuSections,DateTime.UtcNow,DateTime.UtcNow);
     }
 }

@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 
 namespace BuberDinner.Api.Controllers;
-
+[Route("api/[controller]")]
 public class DinnersController:BaseController
 {
     [HttpGet]

@@ -2,14 +2,15 @@
 
 public sealed class HostId:Common.Models.ValueObject
 {
-    public Guid Value { get; }
+    public string Value { get; }
 
-    private HostId(Guid value)
+    private HostId(string value)
     {
         Value = value;
     }
 
-    public static HostId CreateUnique() => new(Guid.NewGuid());
+    public static HostId CreateUnique() => new(Guid.NewGuid().ToString());
+    public static HostId Create(string value) => new HostId(value);
     public override IEnumerable<object> GetEqualityComponents()
     {
         yield return Value;
